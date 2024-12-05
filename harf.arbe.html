@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محول الأرقام إلى حروف والعكس</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7fa;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #007bff;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        select, textarea {
+            width: 100%;
+            padding: 12px;
+            font-size: 18px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            margin-bottom: 20px;
+            background-color: #f8f9fa;
+        }
+
+        textarea {
+            height: 100px;
+            resize: none;
+        }
+
+        .output {
+            margin-top: 20px;
+            font-size: 18px;
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            word-wrap: break-word;
+            text-align: left;
+        }
+
+        .copyButton {
+            padding: 10px 18px;
+            background-color: #007bff;
+            border-radius: 8px;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .copyButton:hover {
+            background-color: #0056b3;
+        }
+
+        .inputWrapper {
+            margin-bottom: 30px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>محول الأرقام إلى حروف والعكس</h1>
+
+        <!-- اختيار نوع التحويل -->
+        <div class="inputWrapper">
+            <select id="conversionType" onchange="changeConversionType()">
+                <option value="toLetters">من أرقام إلى حروف</option>
+                <option value="toNumbers">من حروف إلى أرقام</option>
+            </select>
+        </div>
+
+        <!-- الإدخال والتحويل -->
+        <div class="inputWrapper">
+            <textarea id="inputText" placeholder="حول من أرقام إلى حروف" oninput="convert()"></textarea><br>
+            <div class="output" id="output"></div>
+            <button class="copyButton" onclick="copyText()">نسخ النص</button>
+        </div>
+    </div>
+
+    <script>
+        // خريطة تحويل الأرقام إلى حروف
+        const numberToLetterMap = {
+            "001": "ا", "002": "ب", "003": "ت", "004": "ث", "005": "ج", "006": "ح", "007": "خ", "008": "د", 
+            "009": "ذ", "010": "ر", "011": "ز", "012": "س", "013": "ش", "014": "ص", "015": "ض", "016": "ط",
+            "017": "ظ", "018": "ع", "019": "غ", "020": "ف", "021": "ق", "022": "ك", "023": "ل", "024": "م",
+            "025": "ن", "026": "ه", "027": "و", "028": "ي", "029": "ى", "030": "ء", "031": "ئ", "032": "أ",
+            "033": "إ", "034": "آ", "035": "ؤ", "036": "لا", "037": "لأ", "038": "لإ", "039": "مّ", "040": "ة",
+            "041": "(", "042": ")", "043": "؛", "044": "&", "045": ":", "046": "\"", "047": "-", "048": ".",
+            "049": "،", "050": "؟", "051": "!", "052": "'", "053": "#", "054": "^", "055": "}", "056": "{",
+            "057": "[", "058": "]", "059": "|", "060": "¥", "061": "<", "062": "~", "063": "•", "064": "•",
+            "065": "_", "066": "€", "067": "<", "068": "£", "069": "ـ", "070": "ً", "071": "َّ", "072": "ٍ",
+            "073": "ُ", "074": "ِ", "075": "ْ", "076": "ٌ", "077": "ٰ", "078": "ٓ"
+        };
+
+        // خريطة تحويل الحروف إلى أرقام (عكس الخريطة السابقة)
+        const letterToNumberMap = Object.fromEntries(
+            Object.entries(numberToLetterMap).map(([key, value]) => [value, key])
+        );
+
+        // دالة لتحويل بناءً على نوع الاختيار
+        function convert() {
+            const inputText = document.getElementById("inputText").value.trim();
+            const conversionType = document.getElementById("conversionType").value;
+
+            let result = '';
+            if (conversionType === "toLetters") {
+                // تحويل الأرقام إلى حروف
+                const numbers = inputText.split(/\s*:\s*|\s+/); // تقسيم الأرقام بناءً على المسافات أو الفواصل :
+                result = numbers.map(num => {
+                    const digits = num.match(/.{3}/g) || [];
+                    return digits.map(digit => {
+                        return numberToLetterMap[digit] || digit;
+                    }).join('');
+                }).join(' - ');
+            } else if (conversionType === "toNumbers") {
+                // تحويل الحروف إلى أرقام
+                result = inputText.split(/\s+/).map(word => {
+                    return word.split('').map(char => {
+                        return letterToNumberMap[char] || char;
+                    }).join('');
+                }).join(' : ');
+            }
+
+            document.getElementById("output").textContent = result || "يرجى إدخال النص.";
+        }
+
+        // دالة لنسخ النص المحول
+        function copyText() {
+            const text = document.getElementById("output").textContent;
+            navigator.clipboard.writeText(text);
+        }
+
+        // مسح النص عند تغيير نوع التحويل
+        function changeConversionType() {
+            const conversionType = document.getElementById("conversionType").value;
+            const inputText = document.getElementById("inputText");
+
+            if (conversionType === "toLetters") {
+                inputText.placeholder = "حول من أرقام إلى حروف";
+            } else {
+                inputText.placeholder = "حول من حروف إلى أرقام";
+            }
+            inputText.value = '';  // مسح النص عند التغيير
+        }
+    </script>
+</body>
+</html>
